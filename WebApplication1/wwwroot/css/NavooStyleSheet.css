@@ -1,0 +1,21 @@
+﻿/*this is to make the button look like hyperlink*/
+button.link {
+    /*font-family: "Verdana" sans-serif;*/
+    /*font-size: 1em;*/
+    text-align: left;
+    color: #0366d6;    
+    background: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    -moz-user-select: text;
+    /* override all your button styles here if there are any others */
+}
+button.link:hover {
+    text-decoration: underline;
+}
+button.link:focus {
+    color: black;
+}
+/**/
