@@ -67,81 +67,81 @@ function fnServerOData(sUrl, aoData, fnCallback, oSettings) {
             data.$count = true;
         }
 
-        //var asFilters = [];
+        var asFilters = [];
        
-        //var asColumnFilters = []; //used for jquery.dataTables.columnFilter.js
-        //$.each(oSettings.aoColumns,
-        //    function (i, value) {
+        var asColumnFilters = []; //used for jquery.dataTables.columnFilter.js
+        $.each(oSettings.aoColumns,
+            function (i, value) {
 
-        //        var sFieldName = value.sName || value.mData;
-        //        var columnFilter = oParams["sSearch_" + i]; //fortunately columnFilter's _number matches the index of aoColumns
+                var sFieldName = value.sName || value.mData;
+                var columnFilter = oParams["sSearch_" + i]; //fortunately columnFilter's _number matches the index of aoColumns
 
-        //        if ((oParams.sSearch !== null && oParams.sSearch !== "" || columnFilter !== null && columnFilter !== "") && value.bSearchable) {
-        //            switch (value.sType) {
-        //            case 'string':
-        //            case 'html':
+                if ((oParams.sSearch !== null && oParams.sSearch !== "" || columnFilter !== null && columnFilter !== "") && value.bSearchable) {
+                    switch (value.sType) {
+                    case 'string':
+                    case 'html':
 
-        //                if (oParams.sSearch !== null && oParams.sSearch !== "")
-        //                {
-        //                    // asFilters.push("substringof('" + oParams.sSearch + "', " + sFieldName + ")");
-        //                    // substringof does not work in v4???
-        //                    asFilters.push("indexof(tolower(" + sFieldName + "), '" + oParams.sSearch.toLowerCase() + "') gt -1");
-        //                }
+                        if (oParams.sSearch !== null && oParams.sSearch !== "")
+                        {
+                            // asFilters.push("substringof('" + oParams.sSearch + "', " + sFieldName + ")");
+                            // substringof does not work in v4???
+                            asFilters.push("indexof(tolower(" + sFieldName + "), '" + oParams.sSearch.toLowerCase() + "') gt -1");
+                        }
 
-        //                if (columnFilter !== null && columnFilter !== "") {
-        //                    asColumnFilters.push("indexof(tolower(" + sFieldName + "), '" + columnFilter.toLowerCase() + "') gt -1");
-        //                }
-        //                break;
+                        if (columnFilter !== null && columnFilter !== "") {
+                            asColumnFilters.push("indexof(tolower(" + sFieldName + "), '" + columnFilter.toLowerCase() + "') gt -1");
+                        }
+                        break;
 
-        //            case 'date':
-        //            case 'numeric':
-        //                var fnFormatValue = 
-        //                    (value.sType == 'numeric') ? 
-        //                        function(val) { return val; } :
-        //                        function(val) { 
-        //                                // Here is a mess. OData V2, V3, and V4 se different formats of DateTime literals.
-        //                                switch(oSettings.oInit.iODataVersion){
-        //                                        // V2 works with the following format:
-        //                                        // http://services.odata.org/V2/OData/OData.svc/Products?$filter=(ReleaseDate+lt+2014-04-29T09:00:00.000Z)                                                              
-        //                                        case 4: return (new Date(val)).toISOString(); 
-        //                                        // V3 works with the following format:
-        //                                        // http://services.odata.org/V3/OData/OData.svc/Products?$filter=(ReleaseDate+lt+datetimeoffset'2008-01-01T07:00:00')
-        //                                        case 3: return "datetimeoffset'" + (new Date(val)).toISOString() + "'";  
-        //                                        // V2 works with the following format:
-        //                                        // http://services.odata.org/V2/OData/OData.svc/Products?$filter=(ReleaseDate+lt+DateTime'2014-04-29T09:00:00.000Z')
-        //                                        case 2: return "DateTime'" + (new Date(val)).toISOString() + "'"; 
-        //                                }
-        //                        }
+                    case 'date':
+                    case 'numeric':
+                        var fnFormatValue = 
+                            (value.sType == 'numeric') ? 
+                                function(val) { return val; } :
+                                function(val) { 
+                                        // Here is a mess. OData V2, V3, and V4 se different formats of DateTime literals.
+                                        switch(oSettings.oInit.iODataVersion){
+                                                // V2 works with the following format:
+                                                // http://services.odata.org/V2/OData/OData.svc/Products?$filter=(ReleaseDate+lt+2014-04-29T09:00:00.000Z)                                                              
+                                                case 4: return (new Date(val)).toISOString(); 
+                                                // V3 works with the following format:
+                                                // http://services.odata.org/V3/OData/OData.svc/Products?$filter=(ReleaseDate+lt+datetimeoffset'2008-01-01T07:00:00')
+                                                case 3: return "datetimeoffset'" + (new Date(val)).toISOString() + "'";  
+                                                // V2 works with the following format:
+                                                // http://services.odata.org/V2/OData/OData.svc/Products?$filter=(ReleaseDate+lt+DateTime'2014-04-29T09:00:00.000Z')
+                                                case 2: return "DateTime'" + (new Date(val)).toISOString() + "'"; 
+                                        }
+                                }
 
-        //                // Currently, we cannot use global search for date and numeric fields (exception on the OData service side)
-        //                // However, individual column filters are supported in form lower~upper
-        //                if (columnFilter !== null && columnFilter !== "" && columnFilter !== "~") {
-        //                    asRanges = columnFilter.split("~");
-        //                    if (asRanges[0] !== "") {
-        //                        asColumnFilters.push("(" + sFieldName + " gt " + fnFormatValue(asRanges[0]) + ")");
-        //                    }
+                        // Currently, we cannot use global search for date and numeric fields (exception on the OData service side)
+                        // However, individual column filters are supported in form lower~upper
+                        if (columnFilter !== null && columnFilter !== "" && columnFilter !== "~") {
+                            asRanges = columnFilter.split("~");
+                            if (asRanges[0] !== "") {
+                                asColumnFilters.push("(" + sFieldName + " gt " + fnFormatValue(asRanges[0]) + ")");
+                            }
 
-        //                    if (asRanges[1] !== "") {
-        //                        asColumnFilters.push("(" + sFieldName + " lt " + fnFormatValue(asRanges[1]) + ")");
-        //                    }
-        //                }
-        //                break;
-        //            default:
-        //            }
-        //        }
-        //    });
+                            if (asRanges[1] !== "") {
+                                asColumnFilters.push("(" + sFieldName + " lt " + fnFormatValue(asRanges[1]) + ")");
+                            }
+                        }
+                        break;
+                    default:
+                    }
+                }
+            });
 
-        //if (asFilters.length > 0) {
-        //    data.$filter = asFilters.join(" or ");
-        //}
+        if (asFilters.length > 0) {
+            data.$filter = asFilters.join(" or ");
+        }
 
-        //if (asColumnFilters.length > 0) {
-        //    if (data.$filter !== undefined) {
-        //        data.$filter = " ( " + data.$filter + " ) and ( " + asColumnFilters.join(" and ") + " ) ";
-        //    } else {
-        //        data.$filter = asColumnFilters.join(" and ");
-        //    }
-        //}
+        if (asColumnFilters.length > 0) {
+            if (data.$filter !== undefined) {
+                data.$filter = " ( " + data.$filter + " ) and ( " + asColumnFilters.join(" and ") + " ) ";
+            } else {
+                data.$filter = asColumnFilters.join(" and ");
+            }
+        }
 
         var asOrderBy = [];
         for (var i = 0; i < oParams.iSortingCols; i++) {
